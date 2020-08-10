@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: ./nginx
+    volumes:
+    - ./nginx/files/ssl.conf:/etc/nginx/conf.d/ssl.conf
+    ports:
+    - "443:443"
+
