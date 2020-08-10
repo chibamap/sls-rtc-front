@@ -5,4 +5,4 @@ dressup:
 	scripts/init.sh
 
 clean:
-	rm -f nginx/data/*
+	rm -f nginx/ssl/*
