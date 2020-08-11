@@ -5,7 +5,7 @@
         v-flex.text-center
           div.videos
 
-            video(ref="localVideo" muted autoplay)
+            video(ref="localVideo" muted autoplay width="240" height="180" )
 
       v-row
         v-btn(@click="makePeer") make remote peer
@@ -14,7 +14,7 @@
         v-card(v-for="(conn, index) in conns" :key="index" outlined)
           v-card-text
             v-row
-              video(ref="remoteVideo" muted autoplay)
+              video(ref="remoteVideo" autoplay width="240" height="180")
               v-btn(@click="createOffer(conn)" v-if="!conn.localSDP && !conn.remoteSDP") create offer
               v-btn(@click="createAnswer(conn)" v-if="!conn.localSDP && conn.remoteSDP") create answer
 
@@ -25,6 +25,10 @@
             v-row
               v-textarea(cols="40" rows="3" v-if="!conn.remoteSDP" ref="remoteMessage" v-model="conn.remoteMessage" label="paste remote offer here" outlined)
               v-btn(@click="setRemoteSDP(conn)" v-if="!conn.remoteSDP") set remote sdp
+            v-row
+              v-textarea(cols="40" rows="3" :value="conn.icelog" label="local ice cadidate log" outlined readonly)
+              v-textarea(cols="40" rows="3" v-model="conn.remoteIce" label="remote ice cadidate" outlined)
+              v-btn(@click="addRemoteIce(conn)" ) add remote ice
 
 
 </template>
@@ -36,19 +40,19 @@ const videosize = {
   height: 180
 }
 
-let localStream = null
+//let localStream = null
 
 export default {
   data() {
     return {
       conns: [],
-      remoteOffer: []
+      remoteOffer: [],
+      localStream: null
     }
   },
   watch: {
     conns: {
       handler: function(val, old) {
-        console.log('changed')
       },
       deep: true
     }
@@ -66,8 +70,8 @@ export default {
     var self = this
     this.startLocalMedia()
     .then(function(stream) {
-      self.$refs.localVideo.srcObject = localStream
-      self.$refs.localVideo.play()
+      self.$refs.localVideo.srcObject = stream
+      self.localStream = stream
     })
 
   },
@@ -75,37 +79,43 @@ export default {
     startLocalMedia() {
       const self = this
       return navigator.mediaDevices.getUserMedia(
-          {video: videosize, audio: false}
+          {video: videosize, audio: true}
         )
-        .then(function(stream) {
-          localStream = stream
-          return stream
-        })
         .catch(err => console.error(err))
     },
 
     // start point
 
     makePeer() {
-      let connection = {}
+      let connection = {
+        peer: null,
+        icelog: '',
+      }
+
       try {
-        let peer = new RTCPeerConnection()
+        let peer = new RTCPeerConnection({sdpSemantics:'plan-b'})
         connection.peer = peer
         let self = this
+        const iceSeparator = "\n--------\n"
+        const iceEnd = "end-of-candidates\n"
         // send any ice candidates to the other peer
         peer.onicecandidate = function (event) {
           if (event.candidate) {
             console.log('on candidate');
             console.log(event.candidate)
+            let log = JSON.stringify(event.candidate)
+            connection.icelog += log + iceSeparator
+
           } else {
             console.log("candidate end. ------- phase=" + event.eventPhase);
+            connection.icelog += iceEnd
           }
         }
         peer.ontrack = function (e) {
           self.onRemoteTrack(connection, e)
         }
 
-        localStream.getTracks().forEach(track => {
+        this.localStream.getTracks().forEach(track => {
             peer.addTrack(track)
         })
       } catch (e) {
@@ -159,6 +169,19 @@ export default {
       }
     },
 
+    addRemoteIce(connection) {
+      const ice = JSON.parse(connection.remoteIce)
+      connection.peer.addIceCandidate(ice)
+        .then(function() {
+          console.log('remote ice was added')
+          connection.remoteIce = null
+        })
+        .catch(function(e){
+          console.log('failed to add remote ice')
+          console.log(e)
+        })
+    },
+
     // webrtc peer connection event
 
     onRemoteTrack(connection, e) {
@@ -170,7 +193,7 @@ export default {
         const index = this.conns.indexOf(connection)
         const video = this.$refs.remoteVideo[index]
         video.srcObject = connection.stream
-        video.play()
+        //video.play()
         //this.conns.splice(index, 1, connection)
       }
     }

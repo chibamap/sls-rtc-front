@@ -6,6 +6,9 @@ export default {
   ** See https://nuxtjs.org/api/configuration-mode
   */
   mode: 'spa',
+  router: {
+    base: '/playground/sls-rtc/'
+  },
   /*
   ** Nuxt target
   ** See https://nuxtjs.org/api/configuration-target
