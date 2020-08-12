@@ -19,7 +19,7 @@ export default {
     createRoom() {
       console.log('create room')
 
-      this.$root.$router.push('room/' + testRoomID )
+      this.$router.push({name: 'room', params: {roomId:  testRoomID }} )
     },
 
   }

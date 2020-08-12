@@ -40,7 +40,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    { src: '~/plugins/apiclient.js', mode: 'client' }
+    { src: '~/plugins/socket.js', mode: 'client' }
   ],
   /*
   ** Auto import components
