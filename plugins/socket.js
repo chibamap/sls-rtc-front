@@ -90,7 +90,7 @@ Socket.prototype.onConnected = function (msg) {
 
 Socket.prototype.onCreateRoom = function (roomID) {
   this.log("on create room. roomID:" + roomID);
-  this.ctx.store.commit("room/newRoom", { roomID })
+  this.ctx.store.commit('home/setNewRoomID', { roomID })
 }
 
 Socket.prototype.onEnterRoom = function (message) {
