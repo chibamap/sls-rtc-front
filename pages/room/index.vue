@@ -64,7 +64,8 @@ export default {
         .catch(err => console.error(err))
     },
     startMeeting() {
-      this.$store.dispatch('room/enter', { roomID: this.$route.params.id })
+
+      this.$store.dispatch('room/enter', { roomID: this.$route.query.id })
     },
   }
 }
