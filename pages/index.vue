@@ -19,9 +19,10 @@ export default {
     createRoom() {
       console.log('create room')
 
-      this.$router.push({name: 'room', params: {roomId:  testRoomID }} )
+      this.$router.push({name: 'room-id', params: {id:  testRoomID }} )
     },
 
   }
 }
+
 </script>

@@ -1,54 +1,60 @@
 'use strict'
-import Vue from 'vue'
 
 function Socket(ctx) { this.ctx = ctx }
 
 function createInstance(ctx) {
-  console.log(ctx);
-  // `options` は option1, option2 そして anotherOption を含む
-  let client = new Socket(ctx);
-
-  client.options = {
+  const s = new Socket(ctx);
+  s.options = {
     url: ctx.env.apibaseurl
   }
-
-  client.connect()
-  return client;
+  s.connect()
+  return s;
 }
 
 export default (ctx, inject) => {
-  let apiclient = createInstance(ctx);
-  Vue.prototype.$apiclient = apiclient
-  inject('apiclient', apiclient)
+  const socket = createInstance(ctx);
+  inject('socket', socket)
 }
 
 Socket.prototype.connect = function () {
   this.socket = new WebSocket(this.options.url);
+
   this.socket.onerror = function (e) {
     console.log('websocket error');
     console.error(e)
-  }
-
-  let self = this;
+  }.bind(this)
 
   this.socket.onmessage = function (e) {
     var msg = eval("(" + e.data + ")");
-    console.log(msg)
     switch (msg.type) {
       case 'connected':
-        self.connectionID = msg.body;
+        this.onConnected(msg)
         break;
       case 'room-created':
-        self.onCreateRoom(msg.body)
+        this.onCreateRoom(msg.body)
         break;
       case 'enter':
-        self.onEnterRoom(msg)
+        this.onEnterRoom(msg)
         break;
       case 'leave':
-        self.onLeave(msg)
+        this.onLeave(msg)
+        break;
+      case 'offer':
+        this.ctx.store.dispatch('room/onOffer', msg)
+        break;
+      case 'answer':
+        this.ctx.store.dispatch('room/onAnswer', msg)
+        break;
+      case 'ice-candidate':
+        this.ctx.store.dispatch('room/onRemoteIce', msg)
         break;
     }
-  }
+  }.bind(this)
+
+  this.socket.onclose = function (e) {
+    console.log('closed socket.' + e.reason)
+    // todo handle as network error. or retry connect
+  }.bind(this)
 }
 
 // api
@@ -75,19 +81,24 @@ Socket.prototype.message = function ({ dest, type, message }) {
   });
 }
 
-// notification
+// message handler
+
+Socket.prototype.onConnected = function (msg) {
+  this.log("connected. connectionID:" + msg.body);
+  this.connectionID = msg.body;
+}
 
 Socket.prototype.onCreateRoom = function (roomID) {
-  console.log("on create room. roomID:" + roomID);
+  this.log("on create room. roomID:" + roomID);
+  this.ctx.store.commit("room/newRoom", { roomID })
 }
 
 Socket.prototype.onEnterRoom = function (message) {
-  console.log("on enter room.");
   if (message.connectionID == this.connectionID) {
-    console.log('skip self connection')
+    this.ctx.store.commit('room/enterRoom', { roomID: message.roomID })
     return;
   }
-  this.ctx.store.commit('room/newConnection', { connectionID: message.connectionID })
+  this.ctx.store.dispatch('room/newConnection', { connectionID: message.connectionID })
 }
 
 Socket.prototype.onLeave = function (message) {
@@ -100,3 +111,6 @@ Socket.prototype._send = function (message) {
   this.socket.send(data);
 }
 
+Socket.prototype.log = function (message) {
+  console.log('[Socket] ' + message)
+}

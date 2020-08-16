@@ -97,6 +97,6 @@ export default {
     host: '0.0.0.0' // デフォルト: localhost
   },
   env: {
-    apibaseurl: 'wss://api.hogehoge-banana.xyz/slsrtc'
+    apibaseurl: process.env.SIG_SV_URL
   }
 }

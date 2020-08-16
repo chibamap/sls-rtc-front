@@ -34,11 +34,6 @@ export default {
     return {
       drawer: false,
       items: [
-        // {
-        //   icon: 'mdi-chart-bubble',
-        //   title: 'Inspire',
-        //   to: '/inspire'
-        // }
       ],
     }
   }

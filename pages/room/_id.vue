@@ -1,13 +1,17 @@
 <template lang="pug">
-  v-layout
-    v-flex.text-center
-      v-btn(@click="startMeeting") start
+  div.root
+    v-container.main.d-flex.align-content-center.flex-wrap
+      v-card(outlined v-for="(connection, index) in connections" :key="index").align-self-center
+        remote-video(:connection="connection").mate
+        v-card-subtitle remote cam
+      v-card(outlined).align-self-center
+        video(ref="localVideo" muted autoplay).mate
+        v-card-subtitle local cam
 
-      div(ref="remoteVideos")
-        // remote-video(v-for="conn in connections" connection=conn)
-      div.local
-        meeting-video(ref="localVideo" muted autoplay)
-      v-btn()
+    v-footer(absolute)
+      v-spacer
+      v-btn(@click="startMeeting" v-if="!roomID" color='primary') star meeting
+
 </template>
 
 <script>
@@ -21,34 +25,35 @@ const videosize = {
   height: 180
 }
 
-let localStream = null
-
 export default {
+  layout: 'room',
   components: {
     RemoteVideo
   },
   data() {
     return {
-
     }
   },
   computed: {
     roomID: function () {
-      return this.$route.params.id
+      return this.$store.state.room.id
     },
     connections: function() {
       return this.$store.state.room.connections
+    },
+    localVideoTrack: function () {
+      return this.$store.getters['room/localVideoTrack']
+    },
+    localStream: function () {
+      return this.$store.state.room.localStream
     }
   },
   mounted() {
-    console.log(this.roomID)
-    var self = this
-    this.startLocalMedia()
-    .then(function() {
-      self.$refs.localVideo.srcObject = localStream
-      self.$refs.localVideo.play()
-    })
-
+    const self = this
+    this.$store.dispatch('room/startLocalMedia')
+      .then(function() {
+        self.$refs.localVideo.srcObject = self.localStream
+      })
   },
   methods: {
     startLocalMedia() {
@@ -56,21 +61,19 @@ export default {
       return navigator.mediaDevices.getUserMedia(
           {video: videosize, audio: true}
         )
-        .then(function(stream) {
-          localStream = stream
-        })
         .catch(err => console.error(err))
     },
     startMeeting() {
-      this.$apiclient.enterRoom(this.roomID)
-    }
+      this.$store.dispatch('room/enter', { roomID: this.$route.params.id })
+    },
   }
 }
 </script>
 
-
-
 <style>
+.root, main, .main {
+  height: 100%;
+}
 video {
   width: 240px;
   height: 180px;
