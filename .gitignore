@@ -93,3 +93,4 @@ sw.*
 nginx/ssl/*
 
 !.keep
+.envrc

@@ -176,7 +176,18 @@ function createConnection(id, peer) {
 
 function newPeer(store, connectionID) {
   try {
-    let peer = new RTCPeerConnection({ sdpSemantics: 'plan-b' })
+    let peer = new RTCPeerConnection({
+      sdpSemantics: 'plan-b',
+      iceServers: [{
+        urls: [
+          'stun:stun.l.google.com:19302',
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302',
+          'stun:stun3.l.google.com:19302',
+          'stun:stun4.l.google.com:19302'
+        ]
+      }]
+    })
 
     peer.onicecandidate = function (event) {
       if (event.candidate) {

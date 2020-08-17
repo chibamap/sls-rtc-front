@@ -24,9 +24,8 @@ export default {
       this.$store.dispatch('home/createRoom')
     },
     goRoom() {
-      this.$router.push({name: 'room', query: {id:  this.roomID }} )
+      this.$router.push('/room/?id='+ this.roomID)
     },
-
   }
 }
 

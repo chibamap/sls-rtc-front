@@ -26,7 +26,6 @@ const videosize = {
 }
 
 export default {
-  layout: 'room',
   components: {
     RemoteVideo
   },
