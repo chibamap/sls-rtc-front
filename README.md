@@ -2,6 +2,9 @@
 
 AWSのAPI GatewayがWebSocketに対応していたので、[前に実験したWebRTC](https://github.com/hogehoge-banana/webrtc-test)のバックエンドをサーバーレス化してみたら、フロントエンドのWebRTCの仕様もガッツリ変わってたので、最近良く使っているNuxtjsに焼き直してみました。
 
+
+[demo](https://hogehoge-banana.xyz/playground/sls-rtc/)
+
 ## 構成
 
 webrtcに関連するところでいうと、シグナリングの開始のイベントは/room/のuiで開始しております。
