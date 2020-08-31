@@ -1,87 +1,10 @@
-
-export const state = () => ({
-  id: null,
-  localStream: null,
-  connections: []
-})
-
-export const getters = {
-  connection: (state) => (id) => {
-    return state.connections.find(conn => conn.id == id)
-  },
-  localVideoTrack: (state) => {
-    if (!state.localVideoStream) {
-      return null
-    }
-    return state.localStream.getVideoTracks()
-      ? state.localVideoStream.getVideoTracks()[0]
-      : null
-  },
-  localAudioTrack: (state) => {
-    if (!state.localAudioStream) {
-      return null
-    }
-    return state.localAudioStream.getAudioTracks()
-      ? state.localAudioStream.getAudioTracks()[0]
-      : null
-  }
-}
-
-export const mutations = {
-  setLocalStream(state, stream) {
-    state.localStream = stream
-  },
-  enterRoom(state, { roomID }) {
-    state.id = roomID
-  },
-  addConnection(state, connection) {
-    state.connections.push(connection)
-  },
-  removeConnection(state, { connectionID }) {
-    const target = this.getters['room/connection'](connectionID)
-    state.connections.splice(state.connections.indexOf(target), 1)
-  },
-  setLocalSDP(state, { connectionID, sdp }) {
-    const target = this.getters['room/connection'](connectionID)
-    target.peer.setLocalDescription(sdp)
-  },
-  setRemoteSDP(state, { connectionID, sdp }) {
-    const target = this.getters['room/connection'](connectionID)
-    target.peer.setRemoteDescription(sdp)
-  },
-  setRemoteStream(state, { connectionID, stream }) {
-    const target = this.getters['room/connection'](connectionID)
-    if (null === target) {
-      console.log(`target connection not found ${connectionID}.`)
-      return
-    }
-    if (stream.getAudioTracks().length) {
-      target.audioStream = stream
-    }
-    if (stream.getVideoTracks().length) {
-      target.videoStream = stream
-    }
-  },
-  connectionReady(state, { connectionID }) {
-    const target = this.getters['room/connection'](connectionID)
-    if (null === target) {
-      console.error(`target connection not found ${connectionID}.`)
-      return
-    }
-    target.ready = true
-    const index = state.connections.indexOf(target)
-    state.connections.splice(index, 1, target)
-  }
-}
-
 const videosize = {
   width: 240,
   height: 180
 }
 
-// actions
 
-export const actions = {
+export default {
   startLocalMedia(store) {
     return navigator.mediaDevices.getUserMedia(
       { video: videosize, audio: true }
@@ -182,9 +105,6 @@ function newPeer(store, connectionID) {
         urls: [
           'stun:stun.l.google.com:19302',
           'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun3.l.google.com:19302',
-          'stun:stun4.l.google.com:19302'
         ]
       }]
     })
