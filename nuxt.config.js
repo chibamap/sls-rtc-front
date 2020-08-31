@@ -1,5 +1,9 @@
 import colors from 'vuetify/es5/util/colors'
 
+if (!process.env.SIG_SV_URL) {
+  console.error('signaling server url was not configured.')
+}
+
 export default {
   /*
   ** Nuxt rendering mode

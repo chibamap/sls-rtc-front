@@ -18,8 +18,6 @@
 
 import RemoteVideo from '~/components/RemoteVideo.vue'
 
-const testRoomID = '6c2c8b8f-2772-4ab3-9784-38e9168af6d1'
-
 const videosize = {
   width: 240,
   height: 180
