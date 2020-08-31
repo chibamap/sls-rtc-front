@@ -10,7 +10,7 @@
 
     v-footer(absolute)
       v-spacer
-      v-btn(@click="startMeeting" v-if="!roomID" color='primary') star meeting
+      v-btn(@click="startMeeting" v-if="!roomID" color='primary') start meeting
 
 </template>
 
