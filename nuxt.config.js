@@ -5,6 +5,7 @@ if (!process.env.SIG_SV_URL) {
 }
 
 export default {
+  srcDir: 'nuxt/',
   /*
   ** Nuxt rendering mode
   ** See https://nuxtjs.org/api/configuration-mode
