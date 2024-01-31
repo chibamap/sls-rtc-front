@@ -1,0 +1,2 @@
+cfg_bucket_name=hogehoge-banana.xyz
+cfg_cf_distribution_id=${CF_DIST_ID}

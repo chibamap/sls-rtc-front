@@ -1,0 +1,7 @@
+{
+  "name": "Serverless webRTC testing app",
+  "short_name": "sls rtc",
+  "lang": "ja",
+  "display": "standalone",
+  "start_url": "./"
+}

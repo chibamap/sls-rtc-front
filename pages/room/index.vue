@@ -7,16 +7,18 @@
       v-card(outlined).align-self-center
         video(ref="localVideo" muted autoplay).mate
         v-card-subtitle local cam
-
-    v-footer(absolute)
-      v-spacer
-      v-btn(@click="startMeeting" v-if="!roomID" color='primary') start meeting
+    MeetingToolbar(
+      :start="startMeeting"
+      :toggleCam="toggleCam"
+      :toggleMic="toggleMic"
+    )
 
 </template>
 
 <script>
 
 import RemoteVideo from '~/components/RemoteVideo.vue'
+import MeetingToolbar from '~/components/MeetingToolbar.vue'
 
 const videosize = {
   width: 240,
@@ -25,7 +27,8 @@ const videosize = {
 
 export default {
   components: {
-    RemoteVideo
+    RemoteVideo,
+    MeetingToolbar
   },
   data() {
     return {
@@ -38,8 +41,8 @@ export default {
     connections: function() {
       return this.$store.state.room.connections
     },
-    localVideoTrack: function () {
-      return this.$store.getters['room/localVideoTrack']
+    localVideoStream: function () {
+      return this.$store.state.room.localVideoStream
     },
     localStream: function () {
       return this.$store.state.room.localStream
@@ -47,10 +50,6 @@ export default {
   },
   mounted() {
     const self = this
-    this.$store.dispatch('room/startLocalMedia')
-      .then(function() {
-        self.$refs.localVideo.srcObject = self.localStream
-      })
   },
   methods: {
     startLocalMedia() {
@@ -61,8 +60,24 @@ export default {
         .catch(err => console.error(err))
     },
     startMeeting() {
-
+      console.log('start meeting')
+      return
       this.$store.dispatch('room/enter', { roomID: this.$route.query.id })
+    },
+    toggleCam() {
+      console.log('toggle cam')
+      const self = this
+      if (!this.localVideoStream) {
+        this.$store.dispatch('room/startLocalVideo')
+          .then(function() {
+            self.$refs.localVideo.srcObject = self.localVideoStream
+          })
+          .catch(err => console.error(err))
+      }
+
+    },
+    toggleMic() {
+      console.log('toggle mic')
     },
   }
 }

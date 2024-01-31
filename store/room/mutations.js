@@ -2,6 +2,12 @@ export default {
   setLocalStream(state, stream) {
     state.localStream = stream
   },
+  setLocalVideoStream(state, stream) {
+    state.localVideoStream = stream
+  },
+  setLocalAudioStream(state, stream) {
+    state.localAudioStream = stream
+  },
   enterRoom(state, { roomID }) {
     state.id = roomID
   },

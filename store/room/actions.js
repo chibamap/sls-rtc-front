@@ -1,8 +1,7 @@
 const videosize = {
-  width: 240,
-  height: 180
+  width: 420,
+  height: 315
 }
-
 
 export default {
   startLocalMedia(store) {
@@ -13,6 +12,14 @@ export default {
         store.commit('setLocalStream', stream)
       })
       .catch(err => console.error(err))
+  },
+  startLocalVideo(store) {
+    return navigator.mediaDevices.getUserMedia(
+      { video: videosize, audio: false }
+    )
+      .then(function (stream) {
+        store.commit('setLocalVideoStream', stream)
+      })
   },
   enter(store, { roomID }) {
     this.$socket.enterRoom(roomID)

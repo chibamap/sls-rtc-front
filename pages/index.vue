@@ -1,9 +1,10 @@
 <template lang="pug">
   v-layout(column justify-center align-center)
     v-flex(xs12 sm8 md6)
-      v-card
+      v-card.ma-1
         v-card-title.headline Welcome to webrtc testing
-        v-card-text room id: {{ roomID }}
+        v-card-text
+          | room id: {{ roomID }}
         v-card-actions
           v-spacer
           v-btn(v-if="roomID" @click="goRoom" color="secondary") go to room
@@ -24,7 +25,7 @@ export default {
       this.$store.dispatch('home/createRoom')
     },
     goRoom() {
-      this.$router.push('/room/?id='+ this.roomID)
+      this.$router.push('/room/?id=' + this.roomID)
     },
   }
 }
